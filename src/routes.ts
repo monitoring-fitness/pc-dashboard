@@ -20,8 +20,20 @@ export const routes: Route[] = [
     ],
   },
   {
-    name: 'Example',
-    key: 'example',
+    // S-TODO:
+    // name: 'menu.train-manage', 这个像是国际化的命名配置呢？
+    name: '训练管理',
+    key: 'train-manage',
+    children: [
+      {
+        name: '计划',
+        key: 'train-manage/view/plan',
+      },
+      {
+        name: '卡片',
+        key: 'train-manage/view/card',
+      },
+    ],
   },
 ];
 
