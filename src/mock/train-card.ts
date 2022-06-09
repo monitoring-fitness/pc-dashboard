@@ -4,7 +4,7 @@ import {
 } from '@/pages/train-manage/model/entity/card';
 
 export const trainCardJson: EntityTrainCard = {
-  card_id: 1,
+  _id: '123',
   name: '测试卡片1',
   memo: '我是测试卡片的备忘录',
   train_program: [
