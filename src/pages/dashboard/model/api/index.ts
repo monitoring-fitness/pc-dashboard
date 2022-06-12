@@ -1,5 +1,5 @@
-export enum CalendarURL {
-  getAll = '',
+export enum PlanCalendarURL {
+  getAll = '/api/plan',
   reRank = '',
   dailyTrainUpdate = '',
 }

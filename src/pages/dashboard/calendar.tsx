@@ -9,7 +9,7 @@ import { useFetchTrainCalendars } from '@/pages/dashboard/model/view-model/useFe
 import { Modal, Spin, Switch } from '@arco-design/web-react';
 import { useRerankCalendars } from '@/pages/dashboard/model/view-model/useRerankCalendars';
 import { useDailyTrainOperator } from '@/pages/dashboard/model/view-model/useDailyTrainOperator';
-import TrainDetail from '@/pages/dashboard/view/train-detail';
+import { TrainDetail } from '@/pages/dashboard/view/train-detail';
 
 const Calendar = (props) => {
   const {
@@ -20,7 +20,8 @@ const Calendar = (props) => {
   const {
     reRanking,
     setReRanking,
-    loading: updateReRankLoading,
+    loading: putReRankLoading,
+    executePut: putReRank,
   } = useRerankCalendars();
   const {
     selectEventID,
@@ -33,17 +34,11 @@ const Calendar = (props) => {
     x: 0,
     y: 0,
   });
-  const calendarComp = React.createRef<FullCalendar>();
 
   // 传给train-form
   const filteredDailyTrain = useMemo(() => {
-    return trainsPlan.find((item) => item.id === selectEventID).train_program;
+    return trainsPlan.find((item) => item._id === selectEventID);
   }, [selectEventID]);
-
-  const handleSaveRanking = () => {
-    const data = calendarComp.current.getApi().getEvents();
-    console.log(data);
-  };
 
   const handleCalendarSelectEvent: TrainCalendarProps['updateSelectInfo'] = (
     cellId,
@@ -52,16 +47,18 @@ const Calendar = (props) => {
     setSelectEventID(cellId);
     setModelShowPos(clickPos);
   };
+
   return (
     <div id={'train-calendar'}>
       <Switch checked={reRanking} onChange={setReRanking} />
-      <Spin loading={fetchTrainsLoading}>
-        <TrainCalendar
-          disableEdit={reRanking}
-          ref={calendarComp}
-          trainCalendarsEvent={trainEvents}
-          updateSelectInfo={handleCalendarSelectEvent}
-        />
+      <Spin delay={500} loading={fetchTrainsLoading}>
+        <div style={{ width: '70vw' }}>
+          <TrainCalendar
+            disableEdit={reRanking}
+            trainCalendarsEvent={trainEvents}
+            updateSelectInfo={handleCalendarSelectEvent}
+          />
+        </div>
       </Spin>
       <Modal
         visible={Boolean(selectEventID)}
@@ -71,8 +68,16 @@ const Calendar = (props) => {
           position: 'absolute',
         }}
         onCancel={() => setSelectEventID(undefined)}
+        footer={null}
       >
-        <TrainDetail />
+        {filteredDailyTrain && (
+          <TrainDetail
+            cardEntity={{
+              ...filteredDailyTrain,
+              name: filteredDailyTrain.snap_card_name,
+            }}
+          />
+        )}
       </Modal>
     </div>
   );

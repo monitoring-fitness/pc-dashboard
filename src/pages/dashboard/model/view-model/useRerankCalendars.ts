@@ -1,12 +1,23 @@
 import useAxios from 'axios-hooks';
-import { CalendarURL } from '@/pages/dashboard/model/api';
+import { PlanCalendarURL } from '@/pages/dashboard/model/api';
 import { useState } from 'react';
 
+interface RerankCalendarResponse {
+  _id: string; // plan id
+  changed_daily_list: Array<{
+    _id: string; // daily id
+    new_date: string; // 新的日期
+  }>;
+}
+
 export const useRerankCalendars = () => {
-  const [{ data, loading }, executePost] = useAxios<unknown, unknown>(
+  const [{ data, loading }, executePut] = useAxios<
+    unknown,
+    RerankCalendarResponse
+  >(
     {
-      url: CalendarURL.reRank,
-      method: 'POST',
+      url: PlanCalendarURL.reRank,
+      method: 'PUT',
     },
     { manual: true }
   );
@@ -15,8 +26,7 @@ export const useRerankCalendars = () => {
 
   return {
     loading,
-    executePost,
-    data: data || [],
+    executePut,
     reRanking,
     setReRanking,
   };
