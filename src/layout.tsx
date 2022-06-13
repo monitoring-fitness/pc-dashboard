@@ -39,7 +39,7 @@ function getIconFromKey(key) {
 }
 
 function getFlattenRoutes(routes) {
-  const mod = import.meta.glob('./pages/**/[a-z[]*.tsx');
+  const mod = import.meta.glob('./features/**/[a-z[]*.tsx');
   const res = [];
   function travel(_routes) {
     _routes.forEach((route) => {
@@ -234,7 +234,7 @@ function PageLayout() {
                 </Route>
                 <Route
                   path="*"
-                  component={lazyload(() => import('./pages/exception/403'))}
+                  component={lazyload(() => import('./features/exception/403'))}
                 />
               </Switch>
             </Content>

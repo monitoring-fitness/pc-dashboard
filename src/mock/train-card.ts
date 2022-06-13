@@ -1,7 +1,7 @@
 import {
   EntityTrainCard,
   TrainType,
-} from '@/pages/train-manage/model/entity/card';
+} from '@/features/train-manage/model/entity/card';
 
 export const trainCardJson: EntityTrainCard = {
   _id: '123',

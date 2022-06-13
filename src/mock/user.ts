@@ -10,7 +10,7 @@ if (!isSSR) {
     setup: () => {
       // 用户信息
       const userRole = window.localStorage.getItem('userRole') || 'admin';
-      Mock.mock(new RegExp('/api/user/userInfo'), () => {
+      Mock.mock(new RegExp('/apis/user/userInfo'), () => {
         return Mock.mock({
           name: '王立群',
           avatar:
@@ -33,7 +33,7 @@ if (!isSSR) {
       });
 
       // 登录
-      Mock.mock(new RegExp('/api/user/login'), (params) => {
+      Mock.mock(new RegExp('/apis/user/login'), (params) => {
         const { userName, password } = JSON.parse(params.body);
         if (!userName) {
           return {
