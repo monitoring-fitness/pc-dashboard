@@ -4,7 +4,7 @@ import {
   EventClickArg,
   EventInput,
 } from '@fullcalendar/common';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -15,8 +15,6 @@ import {
   IconLeft,
   IconRight,
 } from '@arco-design/web-react/icon';
-import { useAppSelector } from '@/hooks';
-import { selectAllPlanCalendar } from '@/features/plan-calendar/plan-calendar.slice';
 
 export interface TrainCalendarProps {
   trainCalendarsEvent: EventInput[];
@@ -71,23 +69,13 @@ const TrainCalendarHeader: React.FC<{
 };
 
 export const TrainCalendar: React.FC<TrainCalendarProps> = ({
+  trainCalendarsEvent,
   updateSelectInfo,
   disableEdit,
 }) => {
-  const calendars = useAppSelector(selectAllPlanCalendar);
   const [currentDate, setCurrentDate] = useState<DatesSetArg>();
 
   const ref = useRef<FullCalendar>();
-
-  const calendarEvents = useMemo(
-    () =>
-      calendars.map((dailyTrain) => ({
-        id: dailyTrain._id,
-        title: dailyTrain.snap_card_name,
-        date: dailyTrain.date,
-      })),
-    [calendars]
-  );
 
   const handleDates = (rangeInfo) => {
     setCurrentDate(rangeInfo);
@@ -119,7 +107,7 @@ export const TrainCalendar: React.FC<TrainCalendarProps> = ({
         headerToolbar={false}
         editable={disableEdit}
         weekends={false}
-        events={calendarEvents}
+        events={trainCalendarsEvent}
         eventClick={handleEventClick}
         datesSet={handleDates}
       />

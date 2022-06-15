@@ -1,6 +1,6 @@
 import defaultSettings from '../settings.json';
 import { configureStore, createSlice } from '@reduxjs/toolkit';
-import planCalendarReducer from '@/features/plan-calendar/plan-calendar.slice';
+import planCalendarReducer from '@/features/work-calendar/train-calendar.slice';
 
 export interface GlobalState {
   settings?: typeof defaultSettings;

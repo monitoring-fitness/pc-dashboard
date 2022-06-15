@@ -1,8 +1,8 @@
 import React from 'react';
-import Calendar from './calendar';
+import WorkCalendar from '@/features/work-calendar';
 
 const Dashboard = (props) => {
-  return <Calendar />;
+  return <WorkCalendar />;
 };
 
 export default Dashboard;
