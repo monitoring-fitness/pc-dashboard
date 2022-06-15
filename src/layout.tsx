@@ -20,6 +20,7 @@ import getUrlParams from './utils/getUrlParams';
 import lazyload from './utils/lazyload';
 import { GlobalState } from './store';
 import styles from './style/layout.module.less';
+import { useAppSelector } from './hooks';
 
 const MenuItem = Menu.Item;
 const SubMenu = Menu.SubMenu;
@@ -44,7 +45,8 @@ function getFlattenRoutes(routes) {
   function travel(_routes) {
     _routes.forEach((route) => {
       if (route.key && !route.children) {
-        route.component = lazyload(mod[`./pages/${route.key}/index.tsx`]);
+        // S-MARK: 路由加载的文件位置
+        route.component = lazyload(mod[`./features/${route.key}/index.tsx`]);
         res.push(route);
       } else if (isArray(route.children) && route.children.length) {
         travel(route.children);
@@ -62,7 +64,7 @@ function PageLayout() {
   const currentComponent = qs.parseUrl(pathname).url.slice(1);
   const locale = useLocale();
   const settings = useSelector((state: GlobalState) => state.settings);
-  const userInfo = useSelector((state: GlobalState) => state.userInfo);
+  const userInfo = useAppSelector((state) => state.settings.userInfo);
 
   const [routes, defaultRoute] = useRoute(userInfo?.permissions);
   const defaultSelectedKeys = [currentComponent || defaultRoute];

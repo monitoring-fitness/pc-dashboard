@@ -52,6 +52,8 @@ export const appSettings = createSlice({
     },
   },
 });
+
+export const { oldSetting } = appSettings.actions;
 const store = configureStore({
   reducer: {
     planCalendar: planCalendarReducer,

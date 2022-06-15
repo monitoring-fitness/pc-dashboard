@@ -23,8 +23,8 @@ import {
   IconInteraction,
   IconTag,
 } from '@arco-design/web-react/icon';
-import { useSelector, useDispatch } from 'react-redux';
-import { GlobalState } from '@/store';
+import { useSelector } from 'react-redux';
+import { GlobalState, oldSetting } from '@/store';
 import { GlobalContext } from '@/context';
 import useLocale from '@/utils/useLocale';
 import Logo from '@/assets/logo.svg';
@@ -35,11 +35,12 @@ import styles from './style/index.module.less';
 import defaultLocale from '@/locale';
 import useStorage from '@/utils/useStorage';
 import { generatePermission } from '@/routes';
+import { useAppDispatch, useAppSelector } from '@/hooks';
 
 function Navbar({ show }: { show: boolean }) {
   const t = useLocale();
-  const userInfo = useSelector((state: GlobalState) => state.userInfo);
-  const dispatch = useDispatch();
+  const userInfo = useAppSelector((state) => state.settings.userInfo);
+  const dispatch = useAppDispatch();
 
   const [_, setUserStatus] = useStorage('userStatus');
   const [role, setRole] = useStorage('userRole', 'admin');
@@ -59,16 +60,16 @@ function Navbar({ show }: { show: boolean }) {
     }
   }
 
+  // S-MARK: 登录？
   useEffect(() => {
-    dispatch({
-      type: 'update-userInfo',
-      payload: {
+    dispatch(
+      oldSetting({
         userInfo: {
           ...userInfo,
           permissions: generatePermission(role),
         },
-      },
-    });
+      })
+    );
   }, [role]);
 
   if (!show) {

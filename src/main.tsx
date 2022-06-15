@@ -13,14 +13,15 @@ import Login from './features/login';
 import checkLogin from './utils/checkLogin';
 import changeTheme from './utils/changeTheme';
 import useStorage from './utils/useStorage';
-import store from './store/index';
 import './mock';
-//
-// const store = createStore(rootReducer);
+import { useAppDispatch } from './hooks';
+import { oldSetting } from './store';
+import store from './store';
 
 function Index() {
   const [lang, setLang] = useStorage('arco-lang', 'en-US');
   const [theme, setTheme] = useStorage('arco-theme', 'light');
+  const dispatch = useAppDispatch();
 
   function getArcoLocale() {
     switch (lang) {
@@ -35,10 +36,8 @@ function Index() {
 
   function fetchUserInfo() {
     axios.get('/api/user/userInfo').then((res) => {
-      store.dispatch({
-        type: 'update-userInfo',
-        payload: { userInfo: res.data },
-      });
+      debugger;
+      dispatch(oldSetting({ userInfo: res.data }));
     });
   }
 
@@ -77,17 +76,22 @@ function Index() {
           },
         }}
       >
-        <Provider store={store}>
-          <GlobalContext.Provider value={contextValue}>
-            <Switch>
-              <Route path="/login" component={Login} />
-              <Route path="/" component={PageLayout} />
-            </Switch>
-          </GlobalContext.Provider>
-        </Provider>
+        <GlobalContext.Provider value={contextValue}>
+          <Switch>
+            <Route path="/login" component={Login} />
+            <Route path="/" component={PageLayout} />
+          </Switch>
+        </GlobalContext.Provider>
       </ConfigProvider>
     </BrowserRouter>
   );
 }
 
-ReactDOM.render(<Index />, document.getElementById('root'));
+ReactDOM.render(
+  <React.Fragment>
+    <Provider store={store}>
+      <Index />
+    </Provider>
+  </React.Fragment>,
+  document.getElementById('root')
+);
