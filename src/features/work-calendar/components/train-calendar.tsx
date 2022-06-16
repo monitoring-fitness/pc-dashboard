@@ -2,6 +2,7 @@ import {
   CalendarApi,
   DatesSetArg,
   EventClickArg,
+  EventDropArg,
   EventInput,
 } from '@fullcalendar/common';
 import React, { useRef, useState } from 'react';
@@ -9,12 +10,19 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { Button, ButtonProps, Space, Tooltip } from '@arco-design/web-react';
+import {
+  Button,
+  ButtonProps,
+  Space,
+  Switch,
+  Tooltip,
+} from '@arco-design/web-react';
 import {
   IconCalendarClock,
   IconLeft,
   IconRight,
 } from '@arco-design/web-react/icon';
+import { useToggle } from 'ahooks';
 
 export interface TrainCalendarProps {
   trainCalendarsEvent: EventInput[];
@@ -26,12 +34,15 @@ export interface TrainCalendarProps {
     cellId: string,
     clickPos: { x: number; y: number }
   ) => void;
+  updateEventNewDate: (id: string, newDate: string) => void;
 }
 
 const TrainCalendarHeader: React.FC<{
   dateText?: string;
   api: CalendarApi;
-}> = ({ dateText, api }) => {
+  editWidgetState: boolean;
+  handleEditWidgetChange: () => void;
+}> = ({ dateText, api, editWidgetState, handleEditWidgetChange }) => {
   const buttonCommon: ButtonProps = {
     shape: 'circle',
     type: 'text',
@@ -64,6 +75,11 @@ const TrainCalendarHeader: React.FC<{
           <IconCalendarClock />
         </Tooltip>
       </Button>
+      <Switch
+        checked={editWidgetState}
+        onChange={handleEditWidgetChange}
+        title={'排序日历'}
+      />
     </Space>
   );
 };
@@ -71,9 +87,10 @@ const TrainCalendarHeader: React.FC<{
 export const TrainCalendar: React.FC<TrainCalendarProps> = ({
   trainCalendarsEvent,
   updateSelectInfo,
-  disableEdit,
+  updateEventNewDate,
 }) => {
   const [currentDate, setCurrentDate] = useState<DatesSetArg>();
+  const [disabledEdit, { toggle: toggleDisableState }] = useToggle(true);
 
   const ref = useRef<FullCalendar>();
 
@@ -94,22 +111,36 @@ export const TrainCalendar: React.FC<TrainCalendarProps> = ({
     updateSelectInfo(id, { x: clientX, y: clientY });
   };
 
+  const handleEventDrop = (arg: EventDropArg) => {
+    const { startStr: afterDate, id } = arg.event;
+    const { startStr: beforeDate } = arg.oldEvent;
+
+    if (beforeDate === afterDate) {
+      return;
+    }
+    updateEventNewDate(id, afterDate);
+  };
+
   return (
     <>
       <TrainCalendarHeader
         api={ref?.current?.getApi()}
         dateText={currentDate?.view?.title}
+        editWidgetState={disabledEdit}
+        handleEditWidgetChange={toggleDisableState}
       />
       <FullCalendar
         ref={ref}
-        plugins={[timeGridPlugin, dayGridPlugin, interactionPlugin]}
-        initialView="dayGridMonth"
+        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         headerToolbar={false}
-        editable={disableEdit}
-        weekends={false}
+        initialView="dayGridMonth"
+        // selectable
+        weekends
+        editable={disabledEdit}
         events={trainCalendarsEvent}
         eventClick={handleEventClick}
         datesSet={handleDates}
+        eventDrop={handleEventDrop}
       />
     </>
   );

@@ -19,30 +19,43 @@ export type BasicStatus = {
   error: string | null;
 };
 
+export type EventDialog = {
+  eventDialog: {
+    open: boolean;
+    anchorPosition: { top: number; left: number };
+  };
+};
+
 const planEntityAdapter = createEntityAdapter<CalendarSchedule>({
-  selectId: (model) => model._id,
+  selectId: (model) => model.id,
 });
 
-export const rerankTrainsDay = createAsyncThunk(
+export const reRankTrainsDay = createAsyncThunk(
   'rerank/work-calendar/trains',
   async (source: RerankViewData, { dispatch, getState }) => {
     /**
      * 组装request
      */
     const getRequestBody = (): ReRankRequest => {
-      const planId = 'test_plan_id';
+      // S-MARK: plan id 之后从用户当前激活的plan里面取
+      const planId = '62a15e24faab15092d60e938';
       return {
         plan_id: planId,
-        changed_daily_list: source,
+        changed_daily_list: [source],
       };
     };
 
-    await axios.put<unknown>('/api/plan', getRequestBody());
-
-    // CONTINUE: 更新日历数据
-    // CONTINUE: 检查后端接口，重命名 ReRankRequest 相关字段
-    // CONTINUE: plan该怎么取？放哪里？
-    // dispatch(dailyTrainUpdate({}));
+    try {
+      await axios.patch<unknown>('/api/plan', getRequestBody());
+      dispatch(
+        dailyTrainUpdate({
+          id: source.daily_train_id,
+          changes: { date: source.new_date },
+        })
+      );
+    } catch (e) {
+      console.error(e);
+    }
   }
 );
 
@@ -55,9 +68,15 @@ export const getAllCalendars = createAsyncThunk(
 );
 
 // 1. 创建entity
-const initialState = planEntityAdapter.getInitialState<BasicStatus>({
+const initialState = planEntityAdapter.getInitialState<
+  BasicStatus & EventDialog
+>({
   status: 'idle',
   error: null,
+  eventDialog: {
+    open: false,
+    anchorPosition: { top: 200, left: 400 },
+  },
 });
 
 // 2. 初始化reducer
@@ -66,6 +85,18 @@ const trainCalendarSlice = createSlice({
   initialState: initialState,
   reducers: {
     dailyTrainUpdate: planEntityAdapter.updateOne,
+    openEventDialog: (state, action) => {
+      state.eventDialog = {
+        open: true,
+        ...action.payload,
+      };
+    },
+    closeEventDialog: (state, action) => {
+      state.eventDialog = {
+        ...state.eventDialog,
+        open: false,
+      };
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(getAllCalendars.pending, (state) => {
@@ -85,5 +116,8 @@ const trainCalendarSlice = createSlice({
 export const { selectAll: selectAllPlanCalendar } =
   planEntityAdapter.getSelectors<AppRootState>((state) => state.planCalendar);
 
-export const { dailyTrainUpdate } = trainCalendarSlice.actions;
+export const selectEventDialog = (state: AppRootState) =>
+  state.planCalendar.eventDialog;
+export const { dailyTrainUpdate, openEventDialog, closeEventDialog } =
+  trainCalendarSlice.actions;
 export default trainCalendarSlice.reducer;
