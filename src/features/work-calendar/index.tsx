@@ -11,11 +11,11 @@ import {
 } from '@/features/work-calendar/train-calendar.slice';
 import React, { useMemo, useState } from 'react';
 import {
-  TrainCalendar,
+  Calendar,
   TrainCalendarProps,
-} from '@/features/work-calendar/components/train-calendar';
+} from '@/features/work-calendar/components/calendar';
 import { Message, Modal, Spin, Switch } from '@arco-design/web-react';
-import { TrainDetail } from '@/features/dashboard/view/train-detail';
+import { Detail } from '@/features/work-calendar/components/detail';
 import { useMount } from 'ahooks';
 
 const WorkCalendar = () => {
@@ -57,7 +57,7 @@ const WorkCalendar = () => {
     <div id={'plan-work-calendar'}>
       <Spin delay={500} loading={loading === 'loading'}>
         <div style={{ width: '70vw' }}>
-          <TrainCalendar
+          <Calendar
             // disableEdit={reRanking}
             disableEdit={false}
             trainCalendarsEvent={mappedCalendarEvents}
@@ -80,7 +80,7 @@ const WorkCalendar = () => {
         onCancel={() => dispatch(closeEventDialog({}))}
         footer={null}
       >
-        {dialogInfo.open && <TrainDetail currentID={selectEventId} />}
+        {dialogInfo.open && <Detail currentID={selectEventId} />}
       </Modal>
     </div>
   );

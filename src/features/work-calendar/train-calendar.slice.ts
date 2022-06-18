@@ -7,6 +7,8 @@ import { CalendarSchedule } from '@/features/dashboard/model/entity';
 import axios from 'axios';
 import { AppRootState } from '@/store';
 import {
+  AdjustRequest,
+  GiveUpRequest,
   ReRankRequest,
   RerankViewData,
 } from '@/features/work-calendar/interfaces';
@@ -26,6 +28,8 @@ export type EventDialog = {
   };
 };
 
+export const mockPlanId = '62a15e24faab15092d60e938';
+
 const planEntityAdapter = createEntityAdapter<CalendarSchedule>({
   selectId: (model) => model.id,
 });
@@ -38,9 +42,8 @@ export const reRankTrainsDay = createAsyncThunk(
      */
     const getRequestBody = (): ReRankRequest => {
       // S-MARK: plan id 之后从用户当前激活的plan里面取
-      const planId = '62a15e24faab15092d60e938';
       return {
-        plan_id: planId,
+        plan_id: mockPlanId,
         changed_daily_list: [source],
       };
     };
@@ -64,6 +67,36 @@ export const getAllCalendars = createAsyncThunk(
   async () => {
     const data = await axios.get<CalendarSchedule[]>('/api/plan');
     return data.data;
+  }
+);
+
+export const adjustTrainDay = createAsyncThunk(
+  '',
+  async (body: Omit<AdjustRequest, 'plan_id'>, { dispatch }) => {
+    try {
+      await axios.put<unknown, unknown, AdjustRequest>('/api/plan/adjust', {
+        plan_id: mockPlanId,
+        ...body,
+      });
+      dispatch(getAllCalendars());
+    } catch (e) {
+      console.error(e);
+    }
+  }
+);
+
+export const giveUpTrainDay = createAsyncThunk(
+  '',
+  async (id: GiveUpRequest['daily_train_id'], { dispatch }) => {
+    try {
+      await axios.patch<unknown, unknown, GiveUpRequest>('/api/plan/give-up', {
+        plan_id: mockPlanId,
+        daily_train_id: id,
+      });
+      dispatch(getAllCalendars());
+    } catch (e) {
+      console.error(e);
+    }
   }
 );
 
@@ -113,8 +146,10 @@ const trainCalendarSlice = createSlice({
 });
 
 // 3. 根据业务需要，定制并导出action 和 selector
-export const { selectAll: selectAllPlanCalendar } =
-  planEntityAdapter.getSelectors<AppRootState>((state) => state.planCalendar);
+export const {
+  selectAll: selectAllPlanCalendar,
+  selectById: selectOneCalendarDetail,
+} = planEntityAdapter.getSelectors<AppRootState>((state) => state.planCalendar);
 
 export const selectEventDialog = (state: AppRootState) =>
   state.planCalendar.eventDialog;

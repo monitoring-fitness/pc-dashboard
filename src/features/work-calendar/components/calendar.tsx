@@ -10,6 +10,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import '@fullcalendar/react/dist/vdom'; // 防止报错 ： https://github.com/fullcalendar/fullcalendar/issues/6371
 import {
   Button,
   ButtonProps,
@@ -84,7 +85,7 @@ const TrainCalendarHeader: React.FC<{
   );
 };
 
-export const TrainCalendar: React.FC<TrainCalendarProps> = ({
+export const Calendar: React.FC<TrainCalendarProps> = ({
   trainCalendarsEvent,
   updateSelectInfo,
   updateEventNewDate,
